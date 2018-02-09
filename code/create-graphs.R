@@ -1,9 +1,9 @@
 # ============================================================================
 # Title: Create Graphs
 # Description:
-#   This script makes a players stats csv.
-# Input(s): data file 'hof.csv', 'hof-batting.csv', 'hof - pitching.csv'
-# Output(s): data file 'hof-players.csv'
+#   This script makes graphs.
+# Input(s): multiple .csv files
+# Output(s): graphs in .png files
 # Author: Timothy Tan
 # Date: 2-5-2018
 # ============================================================================
@@ -13,6 +13,11 @@ library(dplyr)
 library(readr)
 
 hof_players <- read_csv("data/hof-player-stats.csv")
+yearly_avg_pitch <- read_csv("data/year_average_pitching.csv")
+yearly_avg_hit <- read_csv("data/year_average_batting.csv")
+war_leaders <- read_csv("data/war_leaders.csv")
+
+hofWAR <- merge(hof_players, war_leaders, by = 'Name')
 
 #3000 hits and 500 home runs
 ggHitsHR <- ggplot() +
@@ -56,6 +61,62 @@ ggKW <- ggplot(data = filter(hof_players, IP > 0)) +
   theme(legend.title=element_blank())
 ggsave(filename = "images/strikeouts_wins.png")
 
+#HR over time
+ggHR <- ggplot() +
+  geom_point(data = filter(hof_players, AB > 4000, HR.x < 500),
+             aes(x = To.x, y = HR.x)) +
+  geom_point(data = filter(hof_players, AB > 4000, HR.x >= 500),
+             aes(x = To.x, y = HR.x, color = 'green')) +
+  scale_color_manual(labels = c('500 home runs'), 
+                     values = c('green')) +
+  geom_hline(yintercept = 500) +
+  labs(x = "Last Year", y = "Home Runs",
+       title = "Home Runs over Time among Hall of Famers") +
+  theme(legend.title=element_blank())
+ggsave(filename = "images/homeruns.png")
+
+#Hits over time
+ggHits <- ggplot() +
+  geom_point(data = filter(hof_players, AB > 4000, H.x < 3000),
+             aes(x = To.x, y = H.x)) +
+  geom_point(data = filter(hof_players, AB > 4000, H.x >= 3000),
+             aes(x = To.x, y = H.x, color = 'green')) +
+  scale_color_manual(labels = c('3000 hits'), 
+                     values = c('green')) +
+  geom_hline(yintercept = 3000) +
+  labs(x = "Last Year", y = "Hits",
+       title = "Hits over Time among Hall of Famers") +
+  theme(legend.title=element_blank())
+ggsave(filename = "images/hits.png")
+
+#Wins over time
+ggWins <- ggplot() +
+  geom_point(data = filter(hof_players, IP > 0, W < 300),
+             aes(x = To.x, y = W)) +
+  geom_point(data = filter(hof_players, IP > 0, W >= 300),
+             aes(x = To.x, y = W, color = 'green')) +
+  scale_color_manual(labels = c('300 wins'), 
+                     values = c('green')) +
+  geom_hline(yintercept = 300) +
+  labs(x = "Last Year", y = "Wins",
+       title = "Wins over Time among Hall of Famers") +
+  theme(legend.title=element_blank())
+ggsave(filename = "images/wins.png")
+
+#Strikeouts over time
+ggHR <- ggplot() +
+  geom_point(data = filter(hof_players, IP > 0, SO.y < 3000),
+             aes(x = To.x, y = SO.y)) +
+  geom_point(data = filter(hof_players, IP > 0, SO.y >= 3000),
+             aes(x = To.x, y = SO.y, color = 'green')) +
+  scale_color_manual(labels = c('3000 strikeouts'), 
+                     values = c('green')) +
+  geom_hline(yintercept = 3000) +
+  labs(x = "Last Year", y = "Strikeouts",
+       title = "Strikeouts over Time among Hall of Famers") +
+  theme(legend.title=element_blank())
+ggsave(filename = "images/strikeouts.png")
+
 #how many players in the hall of fame?
 numBatters <- as.numeric(nrow(filter(hof_players, AB > 4000)))
 numPitchers <- as.numeric(nrow(filter(hof_players, IP > 0)))
@@ -87,6 +148,38 @@ no3kOr500 <- round((numBatters - hits3k - hr500 + over500and3k)/
                      nrow(filter(hof_players, AB > 4000)) * 100, 2)
 no3kOr300 <- round((numPitchers - SO3k - wins300 + over300and3k)/
                      nrow(filter(hof_players, IP > 0)) * 100, 2)
+
+#league HR over time
+ggHR_avg <- ggplot(data = yearly_avg_hit, aes(x = Year, y = HR)) +
+  geom_point() +
+  labs(x = "Year", y = "Home Runs Per Game",
+       title = "Home Runs Per Game") +
+  geom_smooth()
+ggsave(filename = "images/homeruns_per_game.png")
+
+#league Hits over time
+ggHit_avg <- ggplot(data = yearly_avg_hit, aes(x = Year, y = H)) +
+  geom_point() +
+  labs(x = "Year", y = "Hits Per Game",
+       title = "Hits Per Game") +
+  geom_smooth()
+ggsave(filename = "images/hits_per_game.png")
+
+#league Strikeout over time
+ggK_avg <- ggplot(data = yearly_avg_pitch, aes(x = Year, y = SO)) +
+  geom_point() +
+  labs(x = "Year", y = "Strikeouts Per Game",
+       title = "Strikeouts Per Game") +
+  geom_smooth()
+ggsave(filename = "images/strikeouts_per_game.png")
+
+#WAR over time
+ggWAR_HOF <- ggplot(data = hofWAR, aes(x = To.x, y = WAR)) +
+  geom_point() +
+  geom_hline(aes(yintercept = mean(hofWAR$WAR), colour = 2)) +
+  labs(x = "Year", y = "Career WAR",
+       title = "WAR among Hall of Famers") +
+ggsave(filename = "images/warHOF.png")
 
 
 

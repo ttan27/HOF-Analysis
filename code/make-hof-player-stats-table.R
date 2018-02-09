@@ -33,7 +33,10 @@ hof_players <- filter(hof, Category == 'Player')
 hof_players <- hof_players[, c(-7, -34)]
 names(hof_players)[names(hof_players) == 'Inducted.x'] <- 'Inducted'
 
-write_csv(hof_players, "data/hof-player-stats.csv")
+for(i in 1:nrow(hof_players)) {
+  hof_players$Name[i] <- gsub("\\\\.*", "", hof_players$Name[i])
+}
 
+write_csv(hof_players, "data/hof-player-stats.csv")
 
 

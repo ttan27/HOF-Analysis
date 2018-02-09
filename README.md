@@ -8,13 +8,14 @@ This project analyzes Major League Baseball's Hall of Fame players statistically
 
 To read click on the .md file
 
-Topics to look at:
+Topics:
 * Introduction - x
 * The Old Consensus - x
-* WAR (Note to self: need to webscrape)
-* Accolades
+* WAR (Note to self: need to webscrape table from baseball-reference)
 * Market/Location/Team
-* Snubs
+* Accolades
 * First-Ballot
 * Defense
 * Time Period
+* Snubs
+
